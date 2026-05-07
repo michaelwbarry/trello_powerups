@@ -20,7 +20,7 @@ trello-powerups/
 
 To add a new Power-Up: create a new subdirectory with the four files above,
 adjust capabilities and code, register at https://trello.com/power-ups/admin
-with the URL `https://<username>.github.io/trello-powerups/<powerup-name>/`.
+with the URL `https://<username>.github.io/trello_powerups/<powerup-name>/`.
 
 ## Power-Ups in this library
 
@@ -33,7 +33,7 @@ with the URL `https://<username>.github.io/trello-powerups/<powerup-name>/`.
 1. Push this repo to GitHub (public).
 2. Settings → Pages → source: `main` branch, `/` (root). Save.
 3. Wait ~1 minute. Each Power-Up is then reachable at
-   `https://<username>.github.io/trello-powerups/<subdir>/`.
+   `https://<username>.github.io/trello_powerups/<subdir>/`.
 
 ## Registering a Power-Up
 

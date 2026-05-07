@@ -44,7 +44,7 @@ REST API is the fallback plan.
 - The Trello SDK is loaded from `https://p.trellocdn.com/power-up.min.js`
   (always-latest; pin a version if shipping to real users).
 - Each Power-Up's iframe connector URL will be
-  `https://<username>.github.io/trello-powerups/<subdir>/`.
+  `https://<username>.github.io/trello_powerups/<subdir>/`.
 - Registration happens at https://trello.com/power-ups/admin.
 
 ### What I want to do next

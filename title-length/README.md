@@ -12,7 +12,7 @@ Adjust thresholds in `client.js`.
 Once the parent repo is on GitHub Pages, this Power-Up will be at:
 
 ```
-https://<username>.github.io/trello-powerups/title-length/
+https://<username>.github.io/trello_powerups/title-length/
 ```
 
 That's the iframe connector URL to register at https://trello.com/power-ups/admin.
