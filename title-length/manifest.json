@@ -1,0 +1,17 @@
+{
+  "name": "Title Length Checker",
+  "details": "Flags cards with overly long titles using a colored badge.",
+  "icon": {
+    "url": "https://p.trellocdn.com/power-up-default-icon.svg"
+  },
+  "author": "You",
+  "capabilities": [
+    "card-badges",
+    "card-detail-badges"
+  ],
+  "connectors": {
+    "iframe": {
+      "url": "./index.html"
+    }
+  }
+}
