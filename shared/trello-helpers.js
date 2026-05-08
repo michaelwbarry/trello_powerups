@@ -39,6 +39,51 @@
       if (color) b.color = color;
       if (icon) b.icon = icon;
       return b;
+    },
+
+    /**
+     * Read a board-shared setting, merged onto a defaults object.
+     * Treats missing/empty stored values as "use defaults".
+     * @param {object} t - the Trello iframe context
+     * @param {string} key
+     * @param {object} defaults - shape and default values for the setting
+     * @returns {Promise<object>}
+     */
+    getBoardSetting: function (t, key, defaults) {
+      return t.get('board', 'shared', key).then(function (saved) {
+        var merged = {};
+        var k;
+        for (k in defaults) {
+          if (Object.prototype.hasOwnProperty.call(defaults, k)) merged[k] = defaults[k];
+        }
+        if (saved && typeof saved === 'object') {
+          for (k in saved) {
+            if (Object.prototype.hasOwnProperty.call(saved, k)) merged[k] = saved[k];
+          }
+        }
+        return merged;
+      });
+    },
+
+    /**
+     * Save a board-shared setting (visible to all members of the board).
+     * @param {object} t
+     * @param {string} key
+     * @param {*} value
+     * @returns {Promise<void>}
+     */
+    setBoardSetting: function (t, key, value) {
+      return t.set('board', 'shared', key, value);
+    },
+
+    /**
+     * Remove a board-shared setting so the defaults take over again.
+     * @param {object} t
+     * @param {string} key
+     * @returns {Promise<void>}
+     */
+    removeBoardSetting: function (t, key) {
+      return t.remove('board', 'shared', key);
     }
   };
 
