@@ -30,7 +30,8 @@
     /**
      * Build a badge object with sensible defaults.
      * @param {string} text
-     * @param {string} [color] - one of: green, yellow, orange, red, purple, blue, sky, lime, pink, black, null
+     * @param {string} [color] - one of: blue, green, orange, red, yellow, purple, pink, sky, lime, light-gray, null
+     *   (see https://developer.atlassian.com/cloud/trello/power-ups/capabilities/card-badges/)
      * @param {string} [icon]
      * @returns {object}
      */

@@ -14,9 +14,22 @@
       margin: 0;
       padding: 16px;
     }
+    fieldset {
+      border: 1px solid #dfe1e6;
+      border-radius: 3px;
+      padding: 12px;
+      margin: 0 0 12px 0;
+    }
+    legend {
+      font-weight: 600;
+      padding: 0 4px;
+    }
     label {
       display: block;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
+    }
+    label:last-child {
+      margin-bottom: 0;
     }
     .label-text {
       display: block;
@@ -28,15 +41,18 @@
       color: #5e6c84;
       font-size: 12px;
     }
-    input[type="number"] {
+    input[type="number"],
+    select {
       width: 100%;
       box-sizing: border-box;
       padding: 6px 8px;
       border: 1px solid #dfe1e6;
       border-radius: 3px;
       font-size: 14px;
+      background: white;
     }
-    input[type="number"]:focus {
+    input[type="number"]:focus,
+    select:focus {
       outline: none;
       border-color: #0079bf;
     }
@@ -74,20 +90,34 @@
 </head>
 <body>
   <form id="settings-form">
-    <label>
-      <span class="label-text">
-        Yellow threshold
-        <span class="hint">— titles longer than this get a yellow badge</span>
-      </span>
-      <input type="number" id="yellow" min="1" max="16384" required>
-    </label>
-    <label>
-      <span class="label-text">
-        Red threshold
-        <span class="hint">— titles longer than this get a red warning badge</span>
-      </span>
-      <input type="number" id="red" min="1" max="16384" required>
-    </label>
+    <fieldset>
+      <legend>Warn</legend>
+      <label>
+        <span class="label-text">
+          Threshold
+          <span class="hint">— titles longer than this get a warn badge</span>
+        </span>
+        <input type="number" id="warn-threshold" min="1" max="16384" required>
+      </label>
+      <label>
+        <span class="label-text">Color</span>
+        <select id="warn-color"></select>
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Alert</legend>
+      <label>
+        <span class="label-text">
+          Threshold
+          <span class="hint">— titles longer than this get an alert badge with a ⚠</span>
+        </span>
+        <input type="number" id="alert-threshold" min="1" max="16384" required>
+      </label>
+      <label>
+        <span class="label-text">Color</span>
+        <select id="alert-color"></select>
+      </label>
+    </fieldset>
     <div class="error" id="error" role="alert"></div>
     <div class="actions">
       <button type="submit" class="save">Save</button>

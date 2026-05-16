@@ -1,7 +1,31 @@
 /* global TrelloPowerUp, TrelloHelpers */
 
-var DEFAULTS = { yellow: 155, red: 200 };
+// Keep DEFAULTS, STORAGE_KEY, and the stored-shape contract in sync with client.js.
+var DEFAULTS = {
+  warnThreshold: 155,
+  warnColor: 'yellow',
+  alertThreshold: 200,
+  alertColor: 'red'
+};
 var STORAGE_KEY = 'thresholds';
+
+// Trello's badge color palette. Order matches the docs at
+// https://developer.atlassian.com/cloud/trello/power-ups/capabilities/card-badges/
+// The empty-string option maps to a stored value of `null` ("no color").
+var COLOR_OPTIONS = [
+  { value: '',           label: 'None' },
+  { value: 'blue',       label: 'Blue' },
+  { value: 'green',      label: 'Green' },
+  { value: 'orange',     label: 'Orange' },
+  { value: 'red',        label: 'Red' },
+  { value: 'yellow',     label: 'Yellow' },
+  { value: 'purple',     label: 'Purple' },
+  { value: 'pink',       label: 'Pink' },
+  { value: 'sky',        label: 'Sky' },
+  { value: 'lime',       label: 'Lime' },
+  { value: 'light-gray', label: 'Light gray' }
+];
+var VALID_COLORS = COLOR_OPTIONS.map(function (o) { return o.value === '' ? null : o.value; });
 
 var t = TrelloPowerUp.iframe();
 
@@ -11,34 +35,79 @@ function showError(msg) {
   $('error').textContent = msg || '';
 }
 
-function validate(yellow, red) {
-  if (!Number.isInteger(yellow) || !Number.isInteger(red)) {
+function populateColorSelect(selectEl) {
+  COLOR_OPTIONS.forEach(function (opt) {
+    var o = document.createElement('option');
+    o.value = opt.value;
+    o.textContent = opt.label;
+    selectEl.appendChild(o);
+  });
+}
+
+function selectValueToColor(v) {
+  // Empty option means "no color" — stored as null.
+  return v === '' ? null : v;
+}
+
+function colorToSelectValue(c) {
+  return c === null || c === undefined ? '' : c;
+}
+
+function validate(cfg) {
+  if (!Number.isInteger(cfg.warnThreshold) || !Number.isInteger(cfg.alertThreshold)) {
     return 'Both thresholds must be whole numbers.';
   }
-  if (yellow < 1 || red < 1) {
+  if (cfg.warnThreshold < 1 || cfg.alertThreshold < 1) {
     return 'Thresholds must be greater than zero.';
   }
-  if (red <= yellow) {
-    return 'Red threshold must be greater than yellow threshold.';
+  if (cfg.alertThreshold <= cfg.warnThreshold) {
+    return 'Alert threshold must be greater than warn threshold.';
+  }
+  if (VALID_COLORS.indexOf(cfg.warnColor) === -1 || VALID_COLORS.indexOf(cfg.alertColor) === -1) {
+    return 'Invalid color choice.';
   }
   return null;
 }
 
+// Read raw stored value and translate legacy shape ({yellow, red}) into the
+// new shape. Mirrors readConfig() in client.js — keep them in sync.
 function loadCurrent() {
-  return TrelloHelpers.getBoardSetting(t, STORAGE_KEY, DEFAULTS).then(function (cfg) {
-    $('yellow').value = cfg.yellow;
-    $('red').value = cfg.red;
+  return t.get('board', 'shared', STORAGE_KEY).then(function (saved) {
+    var cfg = {
+      warnThreshold: DEFAULTS.warnThreshold,
+      warnColor: DEFAULTS.warnColor,
+      alertThreshold: DEFAULTS.alertThreshold,
+      alertColor: DEFAULTS.alertColor
+    };
+    if (saved && typeof saved === 'object') {
+      if (typeof saved.yellow === 'number') cfg.warnThreshold = saved.yellow;
+      if (typeof saved.red === 'number') cfg.alertThreshold = saved.red;
+      if (typeof saved.warnThreshold === 'number') cfg.warnThreshold = saved.warnThreshold;
+      if (typeof saved.alertThreshold === 'number') cfg.alertThreshold = saved.alertThreshold;
+      if (Object.prototype.hasOwnProperty.call(saved, 'warnColor')) cfg.warnColor = saved.warnColor;
+      if (Object.prototype.hasOwnProperty.call(saved, 'alertColor')) cfg.alertColor = saved.alertColor;
+    }
+    $('warn-threshold').value = cfg.warnThreshold;
+    $('alert-threshold').value = cfg.alertThreshold;
+    $('warn-color').value = colorToSelectValue(cfg.warnColor);
+    $('alert-color').value = colorToSelectValue(cfg.alertColor);
   });
 }
 
 function onSubmit(e) {
   e.preventDefault();
-  var yellow = parseInt($('yellow').value, 10);
-  var red = parseInt($('red').value, 10);
-  var err = validate(yellow, red);
+  var cfg = {
+    warnThreshold: parseInt($('warn-threshold').value, 10),
+    alertThreshold: parseInt($('alert-threshold').value, 10),
+    warnColor: selectValueToColor($('warn-color').value),
+    alertColor: selectValueToColor($('alert-color').value)
+  };
+  var err = validate(cfg);
   if (err) { showError(err); return; }
   showError('');
-  TrelloHelpers.setBoardSetting(t, STORAGE_KEY, { yellow: yellow, red: red })
+  // Always write the full new shape — this also "migrates" any legacy
+  // {yellow, red} record by overwriting it.
+  TrelloHelpers.setBoardSetting(t, STORAGE_KEY, cfg)
     .then(function () { return t.closePopup(); });
 }
 
@@ -48,6 +117,8 @@ function onReset() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  populateColorSelect($('warn-color'));
+  populateColorSelect($('alert-color'));
   $('settings-form').addEventListener('submit', onSubmit);
   $('reset-btn').addEventListener('click', onReset);
   loadCurrent();
